@@ -1,13 +1,9 @@
 {
   "version": 2,
-  "functions": {
-    "api/routes/weatherRoutes.js": {
-      "runtime": "@vercel/node@1.15.4"
-    },
-    "api/routes/cityRoutes.js": {
-      "runtime": "@vercel/node@1.15.4"
-    }
-  },
+  "builds": [
+    { "src": "**/*", "use": "@vercel/static" },
+    { "src": "api/routes/*.js", "use": "@vercel/node" }
+  ],
   "routes": [
     { "src": "/api/weather/(.*)", "dest": "/api/routes/weatherRoutes.js" },
     { "src": "/api/cities/(.*)", "dest": "/api/routes/cityRoutes.js" },

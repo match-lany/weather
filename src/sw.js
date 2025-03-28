@@ -5,21 +5,28 @@
 
 const CACHE_NAME = 'weather-app-v1';
 
-// 需要缓存的静态资源
-const urlsToCache = [
-  '/',
-  '/index.html',
-  '/css/variables.css',
-  '/css/main.css',
-  '/css/theme.css',
-  '/js/utils.js',
-  '/js/api.js',
-  '/js/location.js',
-  '/js/weather.js',
-  '/js/ui.js',
-  '/js/main.js',
-  '/pages/city.html',
-  // 图标文件将在安装时动态添加
+// 需要缓存的资源列表
+const RESOURCES_TO_CACHE = [
+  './',
+  './index.html',
+  './offline.html',
+  './manifest.json',
+  './css/main.css',
+  './css/variables.css',
+  './css/theme.css',
+  './js/utils.js',
+  './js/api.js',
+  './js/location.js',
+  './js/weather.js',
+  './js/ui.js',
+  './js/main.js',
+  './assets/icons/favicon.ico',
+  './assets/font/qweather-icons.css',
+  './assets/font/qweather-icons.eot',
+  './assets/font/qweather-icons.svg',
+  './assets/font/qweather-icons.ttf',
+  './assets/font/qweather-icons.woff',
+  './assets/font/qweather-icons.woff2'
 ];
 
 // 安装Service Worker
@@ -31,7 +38,7 @@ self.addEventListener('install', event => {
     caches.open(CACHE_NAME)
       .then(cache => {
         console.log('Service Worker: 打开缓存');
-        return cache.addAll(urlsToCache);
+        return cache.addAll(RESOURCES_TO_CACHE);
       })
       .then(() => {
         console.log('Service Worker: 缓存完成');
