@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>平板版 | 轻量版天气应用</title>
+    <style>
+        :root {
+            --primary-color: #4A90E2;
+            --primary-light: #EBF4FD;
+            --primary-dark: #1A5BB6;
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --text-hint: #999999;
+            --bg-color: #FFFFFF;
+            --divider: #EEEEEE;
+            --card-bg: #FFFFFF;
+            --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+            margin: 0;
+            padding: 0;
+            color: var(--text-primary);
+            background-color: var(--bg-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 768px;
+            margin: 0 auto;
+            padding: 0;
+            position: relative;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--divider);
+        }
+
+        .city-selector {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
+
+        .city-name {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .dropdown-icon {
+            font-size: 1rem;
+        }
+
+        .date-time {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            padding: 2rem;
+        }
+
+        .current-weather {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 2rem;
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .weather-icon {
+            font-size: 5rem;
+            margin-bottom: 1rem;
+        }
+
+        .temperature {
+            font-size: 5rem;
+            font-weight: 300;
+            line-height: 1;
+            margin-bottom: 1rem;
+        }
+
+        .weather-desc {
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .temp-range {
+            display: flex;
+            gap: 1rem;
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .detail-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+        }
+
+        .detail-title {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .detail-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .hourly-forecast {
+            grid-column: 1 / -1;
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+            margin-top: 1rem;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .hourly-list {
+            display: flex;
+            overflow-x: auto;
+            gap: 1.5rem;
+            padding-bottom: 1rem;
+        }
+
+        .hourly-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 80px;
+        }
+
+        .hourly-time {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .hourly-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .hourly-temp {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .daily-forecast {
+            grid-column: 1 / -1;
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+            margin-top: 1rem;
+        }
+
+        .daily-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .daily-item {
+            display: grid;
+            grid-template-columns: 0.8fr 0.5fr 2fr 0.8fr;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--divider);
+        }
+
+        .daily-item:last-child {
+            border-bottom: none;
+        }
+
+        .daily-day {
+            font-weight: 500;
+        }
+
+        .daily-icon {
+            font-size: 1.8rem;
+            justify-self: center;
+        }
+
+        .daily-temp-range {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .temp-bar {
+            flex-grow: 1;
+            height: 6px;
+            background-color: var(--primary-light);
+            border-radius: 3px;
+            position: relative;
+        }
+
+        .temp-fill {
+            position: absolute;
+            height: 100%;
+            background-color: var(--primary-color);
+            border-radius: 3px;
+            left: 20%;
+            right: 30%;
+        }
+
+        .daily-precip {
+            color: var(--primary-color);
+            text-align: right;
+        }
+
+        .back-link {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            color: var(--primary-color);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            z-index: 10;
+        }
+
+        .theme-switch {
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+            border: none;
+            border-radius: 4px;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .last-update {
+            text-align: center;
+            color: var(--text-hint);
+            padding: 1rem;
+            font-size: 0.9rem;
+        }
+
+        /* 适配不同尺寸的平板设备 */
+        @media (max-width: 600px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .details-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-link">← 返回首页</a>
+
+    <div class="container">
+        <header>
+            <div class="city-selector" onclick="window.location.href='city-selection.html'">
+                <span class="city-name">北京市</span>
+                <span class="dropdown-icon">▼</span>
+            </div>
+            <div class="date-time">周三, 4月10日 15:30</div>
+            <button class="theme-switch" onclick="window.location.href='tablet-main-dark.html'">切换到深色模式</button>
+        </header>
+
+        <div class="main-content">
+            <div class="current-weather">
+                <div class="weather-icon">☀️</div>
+                <div class="temperature">22°</div>
+                <div class="weather-desc">晴朗</div>
+                <div class="temp-range">
+                    <span>最高 25°</span>
+                    <span>最低 16°</span>
+                </div>
+            </div>
+
+            <div class="details-grid">
+                <div class="detail-card">
+                    <div class="detail-title">风速</div>
+                    <div class="detail-value">3.5 km/h</div>
+                </div>
+                <div class="detail-card">
+                    <div class="detail-title">湿度</div>
+                    <div class="detail-value">45%</div>
+                </div>
+                <div class="detail-card">
+                    <div class="detail-title">能见度</div>
+                    <div class="detail-value">10 km</div>
+                </div>
+                <div class="detail-card">
+                    <div class="detail-title">气压</div>
+                    <div class="detail-value">1015 hPa</div>
+                </div>
+                <div class="detail-card">
+                    <div class="detail-title">日出</div>
+                    <div class="detail-value">06:12</div>
+                </div>
+                <div class="detail-card">
+                    <div class="detail-title">日落</div>
+                    <div class="detail-value">18:45</div>
+                </div>
+            </div>
+
+            <div class="hourly-forecast">
+                <div class="section-title">24小时预报</div>
+                <div class="hourly-list">
+                    <div class="hourly-item">
+                        <div class="hourly-time">现在</div>
+                        <div class="hourly-icon">☀️</div>
+                        <div class="hourly-temp">22°</div>
+                    </div>
+                    <div class="hourly-item">
+                        <div class="hourly-time">16:00</div>
+                        <div class="hourly-icon">☀️</div>
+                        <div class="hourly-temp">23°</div>
+                    </div>
+                    <div class="hourly-item">
+                        <div class="hourly-time">17:00</div>
+                        <div class="hourly-icon">☀️</div>
+                        <div class="hourly-temp">21°</div>
+                    </div>
+                    <div class="hourly-item">
+                        <div class="hourly-time">18:00</div>
+                        <div class="hourly-icon">🌤</div>
+                        <div class="hourly-temp">20°</div>
+                    </div>
+                    <div class="hourly-item">
+                        <div class="hourly-time">19:00</div>
+                        <div class="hourly-icon">🌤</div>
+                        <div class="hourly-temp">19°</div>
+                    </div>
+                    <div class="hourly-item">
+                        <div class="hourly-time">20:00</div>
+                        <div class="hourly-icon">🌙</div>
+                        <div class="hourly-temp">18°</div>
+                    </div>
+                    <div class="hourly-item">
+                        <div class="hourly-time">21:00</div>
+                        <div class="hourly-icon">🌙</div>
+                        <div class="hourly-temp">17°</div>
+                    </div>
+                    <div class="hourly-item">
+                        <div class="hourly-time">22:00</div>
+                        <div class="hourly-icon">🌙</div>
+                        <div class="hourly-temp">16°</div>
+                    </div>
+                    <div class="hourly-item">
+                        <div class="hourly-time">23:00</div>
+                        <div class="hourly-icon">🌙</div>
+                        <div class="hourly-temp">16°</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="daily-forecast">
+                <div class="section-title">3天预报</div>
+                <div class="daily-list">
+                    <div class="daily-item">
+                        <div class="daily-day">今天</div>
+                        <div class="daily-icon">☀️</div>
+                        <div class="daily-temp-range">
+                            <span>16°</span>
+                            <div class="temp-bar">
+                                <div class="temp-fill"></div>
+                            </div>
+                            <span>25°</span>
+                        </div>
+                        <div class="daily-precip">0%</div>
+                    </div>
+                    <div class="daily-item">
+                        <div class="daily-day">周四</div>
+                        <div class="daily-icon">🌤</div>
+                        <div class="daily-temp-range">
+                            <span>15°</span>
+                            <div class="temp-bar">
+                                <div class="temp-fill"></div>
+                            </div>
+                            <span>23°</span>
+                        </div>
+                        <div class="daily-precip">10%</div>
+                    </div>
+                    <div class="daily-item">
+                        <div class="daily-day">周五</div>
+                        <div class="daily-icon">🌦</div>
+                        <div class="daily-temp-range">
+                            <span>14°</span>
+                            <div class="temp-bar">
+                                <div class="temp-fill"></div>
+                            </div>
+                            <span>22°</span>
+                        </div>
+                        <div class="daily-precip">40%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="last-update">最后更新: 15:30</div>
+    </div>
+
+    <script>
+        // 如需添加交互功能可以在这里编写JavaScript代码
+        document.addEventListener('DOMContentLoaded', function() {
+            // 滚动处理
+            const hourlyList = document.querySelector('.hourly-list');
+            
+            let isDown = false;
+            let startX;
+            let scrollLeft;
+
+            hourlyList.addEventListener('mousedown', (e) => {
+                isDown = true;
+                hourlyList.classList.add('active');
+                startX = e.pageX - hourlyList.offsetLeft;
+                scrollLeft = hourlyList.scrollLeft;
+            });
+            
+            hourlyList.addEventListener('mouseleave', () => {
+                isDown = false;
+                hourlyList.classList.remove('active');
+            });
+            
+            hourlyList.addEventListener('mouseup', () => {
+                isDown = false;
+                hourlyList.classList.remove('active');
+            });
+            
+            hourlyList.addEventListener('mousemove', (e) => {
+                if(!isDown) return;
+                e.preventDefault();
+                const x = e.pageX - hourlyList.offsetLeft;
+                const walk = (x - startX) * 2; // 调整滚动速度
+                hourlyList.scrollLeft = scrollLeft - walk;
+            });
+        });
+    </script>
+</body>
+</html> 

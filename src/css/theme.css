@@ -1,0 +1,74 @@
+/* 明亮主题的特定样式 */
+:root[data-theme="light"] {
+  --color-text: #333333;
+  --color-text-light: #666666;
+  --color-background: #ffffff;
+  --color-card: #f5f5f5;
+  --color-border: #e5e5e5;
+  --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  --box-shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* 暗黑主题的特定样式 */
+:root[data-theme="dark"] {
+  --color-text: #ffffff;
+  --color-text-light: #cccccc;
+  --color-background: #121212;
+  --color-card: #1e1e1e;
+  --color-border: #333333;
+  --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  --box-shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* 深色模式下的特殊组件样式 */
+:root[data-theme="dark"] .app-header {
+  background-color: #304c70; /* 深色模式下的导航栏颜色 */
+}
+
+:root[data-theme="dark"] .city-select-modal,
+:root[data-theme="dark"] .location-error-modal {
+  background-color: rgba(0, 0, 0, 0.7); /* 深色模式下的模态框背景更暗 */
+}
+
+:root[data-theme="dark"] .loading-spinner {
+  border-color: #2a2a2a;
+  border-top-color: var(--color-primary);
+}
+
+:root[data-theme="dark"] #city-search-input {
+  background-color: #2a2a2a;
+  color: var(--color-text);
+  border-color: #444;
+}
+
+:root[data-theme="dark"] .primary-btn:hover {
+  background-color: #4a6fa5;
+}
+
+/* 主题切换按钮 */
+.theme-toggle {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: var(--color-primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--box-shadow);
+  z-index: 100;
+  transition: transform var(--transition-fast);
+}
+
+.theme-toggle:hover {
+  transform: scale(1.1);
+}
+
+.theme-toggle svg {
+  width: 24px;
+  height: 24px;
+} 

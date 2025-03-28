@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>城市选择 | 轻量版天气应用</title>
+    <style>
+        :root {
+            --primary-color: #4A90E2;
+            --primary-light: #EBF4FD;
+            --primary-dark: #1A5BB6;
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --text-hint: #999999;
+            --bg-color: #FFFFFF;
+            --divider: #EEEEEE;
+            --card-bg: #FFFFFF;
+            --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+            margin: 0;
+            padding: 0;
+            color: var(--text-primary);
+            background-color: #F5F7FA;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 414px;
+            margin: 0 auto;
+            padding: 0;
+            background-color: var(--bg-color);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            min-height: 100vh;
+            position: relative;
+        }
+
+        .header {
+            background-color: var(--bg-color);
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid var(--divider);
+        }
+
+        .back-icon {
+            margin-right: 0.5rem;
+            cursor: pointer;
+        }
+
+        .header-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .search-bar {
+            margin: 1rem;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border: 1px solid var(--divider);
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+            color: var(--text-primary);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 18px;
+        }
+
+        .location-btn {
+            margin: 0 1rem 1rem;
+            padding: 0.75rem;
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .location-icon {
+            margin-right: 0.5rem;
+        }
+
+        .section-title {
+            padding: 0 1rem;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 1.5rem 0 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .city-list {
+            margin: 0 1rem;
+        }
+
+        .city-item {
+            padding: 1rem;
+            border-bottom: 1px solid var(--divider);
+            cursor: pointer;
+        }
+
+        .city-item:last-child {
+            border-bottom: none;
+        }
+
+        .city-item:hover {
+            background-color: var(--primary-light);
+        }
+
+        .letter-index {
+            position: fixed;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            padding: 0.5rem;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 8px 0 0 8px;
+            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .letter {
+            font-size: 12px;
+            padding: 0.25rem;
+            cursor: pointer;
+            color: var(--primary-color);
+        }
+
+        .back-link {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            color: var(--primary-color);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            z-index: 10;
+        }
+
+        /* 选择省份后的城市选择页面 */
+        .province-cities {
+            display: none; /* 默认隐藏 */
+        }
+
+        .province-header {
+            background-color: var(--bg-color);
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid var(--divider);
+        }
+
+        /* 定位失败提示 */
+        .location-failed {
+            display: none; /* 默认隐藏 */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .location-failed-content {
+            background-color: var(--bg-color);
+            padding: 2rem;
+            border-radius: 8px;
+            text-align: center;
+            max-width: 80%;
+        }
+
+        .warning-icon {
+            font-size: 3rem;
+            color: #FAAD14;
+            margin-bottom: 1rem;
+        }
+
+        .retry-btn {
+            margin-top: 1.5rem;
+            padding: 0.75rem 2rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-link">← 返回首页</a>
+    
+    <div class="container main-page">
+        <div class="header">
+            <span class="back-icon" onclick="window.location.href='mobile-light.html'">←</span>
+            <span class="header-title">城市选择</span>
+        </div>
+
+        <div class="search-bar">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="search-input" placeholder="搜索城市..." id="searchInput">
+        </div>
+
+        <div class="location-btn" onclick="showLocationFailed()">
+            <span class="location-icon">📍</span>
+            <span>定位当前城市</span>
+        </div>
+
+        <div class="section-title">最近使用</div>
+        <div class="city-list" id="recentCities">
+            <div class="city-item" onclick="selectCity('北京市')">北京市</div>
+        </div>
+
+        <div class="section-title">全部省份</div>
+        <div class="city-list" id="provinces">
+            <div class="city-item" onclick="showProvinceCities('北京市')">北京市</div>
+            <div class="city-item" onclick="showProvinceCities('天津市')">天津市</div>
+            <div class="city-item" onclick="showProvinceCities('河北省')">河北省</div>
+            <div class="city-item" onclick="showProvinceCities('山西省')">山西省</div>
+            <div class="city-item" onclick="showProvinceCities('内蒙古自治区')">内蒙古自治区</div>
+            <div class="city-item" onclick="showProvinceCities('辽宁省')">辽宁省</div>
+            <div class="city-item" onclick="showProvinceCities('吉林省')">吉林省</div>
+            <div class="city-item" onclick="showProvinceCities('黑龙江省')">黑龙江省</div>
+            <div class="city-item" onclick="showProvinceCities('上海市')">上海市</div>
+            <div class="city-item" onclick="showProvinceCities('江苏省')">江苏省</div>
+            <div class="city-item" onclick="showProvinceCities('浙江省')">浙江省</div>
+        </div>
+
+        <div class="letter-index">
+            <div class="letter">A</div>
+            <div class="letter">B</div>
+            <div class="letter">C</div>
+            <div class="letter">D</div>
+            <div class="letter">E</div>
+            <div class="letter">F</div>
+            <div class="letter">G</div>
+            <div class="letter">H</div>
+            <div class="letter">J</div>
+            <div class="letter">K</div>
+            <div class="letter">L</div>
+            <div class="letter">M</div>
+            <div class="letter">N</div>
+            <div class="letter">P</div>
+            <div class="letter">Q</div>
+            <div class="letter">R</div>
+            <div class="letter">S</div>
+            <div class="letter">T</div>
+            <div class="letter">W</div>
+            <div class="letter">X</div>
+            <div class="letter">Y</div>
+            <div class="letter">Z</div>
+        </div>
+    </div>
+
+    <!-- 选择省份后的城市选择页面 -->
+    <div class="container province-cities" id="provinceCitiesPage">
+        <div class="province-header">
+            <span class="back-icon" onclick="showMainPage()">←</span>
+            <span class="header-title" id="provinceTitle">河北省</span>
+        </div>
+
+        <div class="search-bar">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="search-input" placeholder="搜索城市...">
+        </div>
+
+        <div class="city-list" id="citiesList">
+            <div class="city-item" onclick="selectCity('石家庄市')">石家庄市</div>
+            <div class="city-item" onclick="selectCity('唐山市')">唐山市</div>
+            <div class="city-item" onclick="selectCity('秦皇岛市')">秦皇岛市</div>
+            <div class="city-item" onclick="selectCity('邯郸市')">邯郸市</div>
+            <div class="city-item" onclick="selectCity('邢台市')">邢台市</div>
+            <div class="city-item" onclick="selectCity('保定市')">保定市</div>
+            <div class="city-item" onclick="selectCity('张家口市')">张家口市</div>
+            <div class="city-item" onclick="selectCity('承德市')">承德市</div>
+            <div class="city-item" onclick="selectCity('沧州市')">沧州市</div>
+            <div class="city-item" onclick="selectCity('廊坊市')">廊坊市</div>
+            <div class="city-item" onclick="selectCity('衡水市')">衡水市</div>
+        </div>
+
+        <div class="letter-index">
+            <div class="letter">A</div>
+            <div class="letter">B</div>
+            <div class="letter">C</div>
+            <div class="letter">D</div>
+            <div class="letter">E</div>
+            <div class="letter">F</div>
+            <div class="letter">G</div>
+            <div class="letter">H</div>
+            <div class="letter">J</div>
+            <div class="letter">L</div>
+            <div class="letter">Q</div>
+            <div class="letter">S</div>
+            <div class="letter">T</div>
+            <div class="letter">X</div>
+            <div class="letter">Y</div>
+            <div class="letter">Z</div>
+        </div>
+    </div>
+
+    <!-- 定位失败提示 -->
+    <div class="location-failed" id="locationFailed">
+        <div class="location-failed-content">
+            <div class="warning-icon">⚠️</div>
+            <div class="failed-title">定位失败</div>
+            <div class="failed-desc">请检查位置权限或手动选择城市</div>
+            <button class="retry-btn" onclick="hideLocationFailed()">重试定位</button>
+        </div>
+    </div>
+
+    <script>
+        // 显示省份对应的城市列表
+        function showProvinceCities(province) {
+            document.querySelector('.main-page').style.display = 'none';
+            document.querySelector('.province-cities').style.display = 'block';
+            document.getElementById('provinceTitle').textContent = province;
+            
+            // 根据选择的省份更新城市列表
+            updateCitiesList(province);
+        }
+
+        // 返回主页面
+        function showMainPage() {
+            document.querySelector('.main-page').style.display = 'block';
+            document.querySelector('.province-cities').style.display = 'none';
+        }
+
+        // 选择城市，返回天气页面
+        function selectCity(city) {
+            window.location.href = 'mobile-light.html';
+        }
+
+        // 显示定位失败提示
+        function showLocationFailed() {
+            document.getElementById('locationFailed').style.display = 'flex';
+        }
+
+        // 隐藏定位失败提示
+        function hideLocationFailed() {
+            document.getElementById('locationFailed').style.display = 'none';
+        }
+
+        // 更新城市列表
+        function updateCitiesList(province) {
+            // 这里应该根据选择的省份动态加载对应的城市列表
+            // 在这个演示中我们只是使用静态数据
+            const citiesListElement = document.getElementById('citiesList');
+            
+            if (province === '北京市' || province === '上海市' || province === '天津市') {
+                citiesListElement.innerHTML = `
+                    <div class="city-item" onclick="selectCity('${province}')">${province}</div>
+                `;
+            } else if (province === '河北省') {
+                citiesListElement.innerHTML = `
+                    <div class="city-item" onclick="selectCity('石家庄市')">石家庄市</div>
+                    <div class="city-item" onclick="selectCity('唐山市')">唐山市</div>
+                    <div class="city-item" onclick="selectCity('秦皇岛市')">秦皇岛市</div>
+                    <div class="city-item" onclick="selectCity('邯郸市')">邯郸市</div>
+                    <div class="city-item" onclick="selectCity('邢台市')">邢台市</div>
+                    <div class="city-item" onclick="selectCity('保定市')">保定市</div>
+                    <div class="city-item" onclick="selectCity('张家口市')">张家口市</div>
+                    <div class="city-item" onclick="selectCity('承德市')">承德市</div>
+                    <div class="city-item" onclick="selectCity('沧州市')">沧州市</div>
+                    <div class="city-item" onclick="selectCity('廊坊市')">廊坊市</div>
+                    <div class="city-item" onclick="selectCity('衡水市')">衡水市</div>
+                `;
+            } else {
+                // 其他省份的城市列表
+                citiesListElement.innerHTML = `
+                    <div class="city-item">数据加载中...</div>
+                `;
+            }
+        }
+
+        // 搜索功能
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const provinces = document.getElementById('provinces').children;
+            
+            for (let i = 0; i < provinces.length; i++) {
+                const province = provinces[i];
+                const provinceName = province.textContent.toLowerCase();
+                
+                if (provinceName.includes(searchTerm)) {
+                    province.style.display = 'block';
+                } else {
+                    province.style.display = 'none';
+                }
+            }
+        });
+    </script>
+</body>
+</html> 

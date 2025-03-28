@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="轻量版天气应用 - 城市选择">
+  <meta name="theme-color" content="#4a6fa5">
+  <title>选择城市 - 轻量天气</title>
+  <link rel="stylesheet" href="../css/variables.css">
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/theme.css">
+  <style>
+    /* 城市选择页面特定样式 */
+    .city-page-container {
+      padding: var(--spacing-md);
+      max-width: var(--container-max-width);
+      margin: 0 auto;
+    }
+    
+    .city-page-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: var(--spacing-lg);
+    }
+    
+    .back-btn {
+      margin-right: var(--spacing-md);
+      font-size: var(--font-size-lg);
+    }
+    
+    .search-bar {
+      display: flex;
+      margin-bottom: var(--spacing-lg);
+    }
+    
+    .search-input {
+      flex: 1;
+      padding: var(--spacing-sm);
+      border: 1px solid var(--color-border);
+      border-radius: var(--border-radius-sm);
+      font-size: var(--font-size-md);
+    }
+    
+    .search-button {
+      padding: var(--spacing-sm) var(--spacing-md);
+      background-color: var(--color-primary);
+      color: white;
+      border-radius: var(--border-radius-sm);
+      margin-left: var(--spacing-xs);
+    }
+    
+    .city-list-section {
+      margin-bottom: var(--spacing-lg);
+    }
+    
+    .province-section {
+      margin-bottom: var(--spacing-md);
+    }
+    
+    .province-title {
+      font-size: var(--font-size-md);
+      padding: var(--spacing-sm);
+      background-color: var(--color-card);
+      border-radius: var(--border-radius-sm);
+      margin-bottom: var(--spacing-sm);
+    }
+    
+    .city-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: var(--spacing-sm);
+    }
+    
+    .city-btn {
+      padding: var(--spacing-sm);
+      background-color: var(--color-card);
+      border-radius: var(--border-radius-sm);
+      text-align: center;
+      transition: background-color var(--transition-fast);
+    }
+    
+    .city-btn:hover {
+      background-color: var(--color-primary);
+      color: white;
+    }
+    
+    .hot-cities {
+      margin-bottom: var(--spacing-lg);
+    }
+    
+    @media (min-width: 768px) {
+      .city-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      }
+      
+      .city-page-container {
+        padding: var(--spacing-lg);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="city-page-container">
+    <header class="city-page-header">
+      <a href="../index.html" class="back-btn">←</a>
+      <h1>选择城市</h1>
+    </header>
+    
+    <div class="search-bar">
+      <input type="text" class="search-input" id="city-search" placeholder="输入城市名称..." aria-label="搜索城市">
+      <button class="search-button" id="search-btn">搜索</button>
+    </div>
+    
+    <section class="city-list-section" id="search-results">
+      <!-- 搜索结果将在这里显示 -->
+    </section>
+    
+    <section class="hot-cities">
+      <h2 class="section-title">热门城市</h2>
+      <div class="city-grid" id="hot-cities">
+        <button class="city-btn" data-city="北京">北京</button>
+        <button class="city-btn" data-city="上海">上海</button>
+        <button class="city-btn" data-city="广州">广州</button>
+        <button class="city-btn" data-city="深圳">深圳</button>
+        <button class="city-btn" data-city="杭州">杭州</button>
+        <button class="city-btn" data-city="武汉">武汉</button>
+        <button class="city-btn" data-city="成都">成都</button>
+        <button class="city-btn" data-city="南京">南京</button>
+        <button class="city-btn" data-city="重庆">重庆</button>
+        <button class="city-btn" data-city="西安">西安</button>
+      </div>
+    </section>
+    
+    <section class="all-cities" id="all-cities">
+      <!-- 省份和城市将通过JavaScript动态加载 -->
+      <div class="loading-spinner" id="loading-cities"></div>
+    </section>
+  </div>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // 加载城市列表
+      loadCities();
+      
+      // 搜索功能
+      document.getElementById('search-btn').addEventListener('click', searchCity);
+      document.getElementById('city-search').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          searchCity();
+        }
+      });
+      
+      // 绑定热门城市点击事件
+      const hotCities = document.querySelectorAll('.city-btn');
+      hotCities.forEach(btn => {
+        btn.addEventListener('click', function() {
+          selectCity(this.getAttribute('data-city'));
+        });
+      });
+    });
+    
+    // 加载城市列表
+    async function loadCities() {
+      try {
+        const response = await fetch('/api/cities/all');
+        const data = await response.json();
+        
+        renderCities(data);
+        document.getElementById('loading-cities').style.display = 'none';
+      } catch (error) {
+        console.error('加载城市列表失败:', error);
+        document.getElementById('all-cities').innerHTML = '<p class="error">加载城市列表失败，请刷新重试</p>';
+      }
+    }
+    
+    // 渲染城市列表
+    function renderCities(data) {
+      const citiesContainer = document.getElementById('all-cities');
+      citiesContainer.innerHTML = '';
+      
+      data.forEach(province => {
+        const provinceSection = document.createElement('div');
+        provinceSection.className = 'province-section';
+        
+        const provinceTitle = document.createElement('h3');
+        provinceTitle.className = 'province-title';
+        provinceTitle.textContent = province.name;
+        provinceSection.appendChild(provinceTitle);
+        
+        const cityGrid = document.createElement('div');
+        cityGrid.className = 'city-grid';
+        
+        province.cities.forEach(city => {
+          const cityBtn = document.createElement('button');
+          cityBtn.className = 'city-btn';
+          cityBtn.textContent = city.name;
+          cityBtn.setAttribute('data-city', city.name);
+          cityBtn.addEventListener('click', function() {
+            selectCity(city.name);
+          });
+          
+          cityGrid.appendChild(cityBtn);
+        });
+        
+        provinceSection.appendChild(cityGrid);
+        citiesContainer.appendChild(provinceSection);
+      });
+    }
+    
+    // 搜索城市
+    async function searchCity() {
+      const keyword = document.getElementById('city-search').value.trim();
+      if (!keyword) return;
+      
+      const resultsContainer = document.getElementById('search-results');
+      resultsContainer.innerHTML = '<div class="loading-spinner"></div>';
+      
+      try {
+        const response = await fetch(`/api/cities/search?keyword=${encodeURIComponent(keyword)}`);
+        const results = await response.json();
+        
+        resultsContainer.innerHTML = '';
+        
+        if (results.length === 0) {
+          resultsContainer.innerHTML = '<p>没有找到匹配的城市</p>';
+          return;
+        }
+        
+        const heading = document.createElement('h2');
+        heading.className = 'section-title';
+        heading.textContent = '搜索结果';
+        resultsContainer.appendChild(heading);
+        
+        const grid = document.createElement('div');
+        grid.className = 'city-grid';
+        
+        results.forEach(city => {
+          const cityBtn = document.createElement('button');
+          cityBtn.className = 'city-btn';
+          cityBtn.textContent = city.name;
+          cityBtn.setAttribute('data-city', city.name);
+          cityBtn.addEventListener('click', function() {
+            selectCity(city.name);
+          });
+          
+          grid.appendChild(cityBtn);
+        });
+        
+        resultsContainer.appendChild(grid);
+      } catch (error) {
+        console.error('搜索城市失败:', error);
+        resultsContainer.innerHTML = '<p class="error">搜索失败，请重试</p>';
+      }
+    }
+    
+    // 选择城市
+    function selectCity(cityName) {
+      localStorage.setItem('selectedCity', cityName);
+      window.location.href = '../index.html';
+    }
+  </script>
+</body>
+</html> 

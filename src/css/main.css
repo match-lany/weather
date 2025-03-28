@@ -1,0 +1,445 @@
+/* 基础样式 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  background-color: var(--color-background);
+  color: var(--color-text);
+  line-height: 1.5;
+  font-size: 16px;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
+  color: inherit;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: var(--font-weight-medium);
+  margin-bottom: var(--spacing-sm);
+}
+
+/* 布局容器 */
+.app-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.container {
+  width: 100%;
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: 0 var(--container-padding);
+}
+
+/* 页头样式 */
+.app-header {
+  background-color: var(--color-primary);
+  color: white;
+  padding: var(--spacing-md);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: var(--box-shadow);
+}
+
+.city-selector {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+}
+
+.city-arrow {
+  margin-left: var(--spacing-xs);
+  font-size: var(--font-size-xs);
+  transition: transform var(--transition-fast);
+}
+
+.city-selector:hover .city-arrow {
+  transform: rotate(180deg);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+}
+
+.refresh-btn {
+  color: white;
+  padding: var(--spacing-xs);
+  border-radius: 50%;
+  transition: transform var(--transition-fast);
+}
+
+.refresh-btn:hover {
+  transform: rotate(30deg);
+}
+
+/* 主要内容区 */
+.app-main {
+  flex: 1;
+  padding: var(--spacing-md) 0;
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  width: 100%;
+  padding: var(--spacing-md);
+}
+
+.section-title {
+  font-size: var(--font-size-md);
+  margin-bottom: var(--spacing-md);
+  color: var(--color-text-light);
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: var(--spacing-xs);
+}
+
+/* 当前天气样式 */
+.current-weather-container {
+  background-color: var(--color-card);
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+  box-shadow: var(--box-shadow);
+}
+
+.weather-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-md);
+}
+
+.temperature {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+}
+
+.weather-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.weather-icon {
+  width: 64px;
+  height: 64px;
+  margin-bottom: var(--spacing-xs);
+}
+
+.weather-text {
+  font-size: var(--font-size-md);
+}
+
+.weather-details {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-md);
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.detail-label {
+  color: var(--color-text-light);
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--spacing-xs);
+}
+
+.detail-value {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+}
+
+/* 预报样式 */
+.hourly-forecast-section,
+.daily-forecast-section,
+.weather-details-section {
+  margin-bottom: var(--spacing-lg);
+}
+
+.hourly-forecast-container {
+  display: flex;
+  overflow-x: auto;
+  padding-bottom: var(--spacing-sm);
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-primary) var(--color-card);
+}
+
+.hourly-forecast-container::-webkit-scrollbar {
+  height: 6px;
+}
+
+.hourly-forecast-container::-webkit-scrollbar-track {
+  background: var(--color-card);
+  border-radius: 3px;
+}
+
+.hourly-forecast-container::-webkit-scrollbar-thumb {
+  background-color: var(--color-primary);
+  border-radius: 3px;
+}
+
+.hourly-item {
+  min-width: 60px;
+  text-align: center;
+  padding: var(--spacing-sm);
+  background-color: var(--color-card);
+  border-radius: var(--border-radius-sm);
+  margin-right: var(--spacing-sm);
+  flex-shrink: 0;
+}
+
+.hourly-time {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-light);
+  margin-bottom: var(--spacing-xs);
+}
+
+.hourly-icon {
+  width: 32px;
+  height: 32px;
+  margin: var(--spacing-xs) auto;
+}
+
+.hourly-temp {
+  font-weight: var(--font-weight-medium);
+}
+
+.daily-forecast-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: var(--spacing-sm);
+}
+
+.forecast-day {
+  background-color: var(--color-card);
+  border-radius: var(--border-radius-sm);
+  padding: var(--spacing-md);
+  text-align: center;
+}
+
+.forecast-date {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-light);
+  margin-bottom: var(--spacing-sm);
+}
+
+.forecast-icon {
+  width: 48px;
+  height: 48px;
+  margin: var(--spacing-sm) auto;
+}
+
+.forecast-temp {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-md);
+}
+
+.temp-high {
+  font-weight: var(--font-weight-medium);
+}
+
+.temp-low {
+  color: var(--color-text-light);
+}
+
+.weather-details-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.weather-detail-card {
+  background-color: var(--color-card);
+  border-radius: var(--border-radius-sm);
+  padding: var(--spacing-md);
+}
+
+.detail-card-title {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-light);
+  margin-bottom: var(--spacing-xs);
+}
+
+.detail-card-value {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+}
+
+/* 页脚样式 */
+.app-footer {
+  background-color: var(--color-card);
+  color: var(--color-text-light);
+  padding: var(--spacing-md);
+  text-align: center;
+  font-size: var(--font-size-sm);
+  border-top: 1px solid var(--color-border);
+}
+
+/* 模态框样式 */
+.city-select-modal,
+.location-error-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: var(--color-background);
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-md);
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--box-shadow);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.close-modal-btn {
+  font-size: var(--font-size-lg);
+  color: var(--color-text-light);
+}
+
+.search-container {
+  display: flex;
+  margin-bottom: var(--spacing-md);
+}
+
+#city-search-input {
+  flex: 1;
+  padding: var(--spacing-sm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-md);
+}
+
+#search-btn {
+  padding: 0 var(--spacing-sm);
+  background-color: var(--color-primary);
+  color: white;
+  border-radius: var(--border-radius-sm);
+  margin-left: var(--spacing-xs);
+}
+
+.city-list {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.city-item {
+  padding: var(--spacing-sm);
+  border-bottom: 1px solid var(--color-border);
+  cursor: pointer;
+}
+
+.city-item:hover {
+  background-color: var(--color-card);
+}
+
+.primary-btn {
+  background-color: var(--color-primary);
+  color: white;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--border-radius-sm);
+  font-weight: var(--font-weight-medium);
+  width: 100%;
+  margin-top: var(--spacing-md);
+}
+
+.primary-btn:hover {
+  background-color: #3a5a83;
+}
+
+/* 加载状态样式 */
+.weather-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-md);
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid var(--color-card);
+  border-top: 4px solid var(--color-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: var(--spacing-sm);
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 响应式调整 */
+@media (min-width: 768px) {
+  .weather-details {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  
+  .hourly-item {
+    min-width: 80px;
+  }
+  
+  .app-main {
+    padding: var(--spacing-lg);
+  }
+}
+
+@media (min-width: 1200px) {
+  .current-weather-container {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .weather-main {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 0;
+  }
+  
+  .weather-details {
+    width: 60%;
+  }
+} 

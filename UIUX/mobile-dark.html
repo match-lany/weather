@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>移动端设计 - 暗黑主题 | 轻量版天气应用</title>
+    <style>
+        :root {
+            --primary-color: #64B5F6;
+            --primary-light: #283C52;
+            --primary-dark: #2E78C9;
+            --text-primary: #FFFFFF;
+            --text-secondary: #BBBBBB;
+            --text-hint: #888888;
+            --bg-color: #121212;
+            --divider: #333333;
+            --card-bg: #1E1E1E;
+            --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+            margin: 0;
+            padding: 0;
+            color: var(--text-primary);
+            background-color: #000000;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 414px;
+            margin: 0 auto;
+            padding: 0;
+            background-color: var(--bg-color);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            min-height: 100vh;
+            position: relative;
+        }
+
+        .header {
+            background-color: var(--bg-color);
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--divider);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .city-name {
+            font-size: 18px;
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+
+        .dropdown-icon {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .header-right {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .main-temp {
+            text-align: center;
+            padding: 2rem 1rem;
+        }
+
+        .temp-value {
+            font-size: 48px;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .weather-desc {
+            font-size: 20px;
+            margin: 0.5rem 0 1rem;
+        }
+
+        .temp-details {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 0.5rem;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .collapsible {
+            margin: 0 1rem 1rem;
+            border: 1px solid var(--divider);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .collapsible-header {
+            padding: 1rem;
+            background-color: var(--card-bg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .collapsible-title {
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .collapsible-icon {
+            transition: transform 0.3s ease;
+        }
+
+        .collapsible-content {
+            padding: 1rem;
+            border-top: 1px solid var(--divider);
+            display: none;
+            background-color: var(--card-bg);
+        }
+
+        .detail-item {
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .detail-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .detail-icon {
+            margin-right: 0.5rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .section-title {
+            padding: 0 1rem;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 1.5rem 0 0.75rem;
+        }
+
+        .hourly-forecast {
+            padding: 0 1rem;
+            overflow-x: auto;
+            display: flex;
+            gap: 1rem;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .hourly-forecast::-webkit-scrollbar {
+            display: none;
+        }
+
+        .hourly-item {
+            min-width: 60px;
+            text-align: center;
+            padding: 1rem 0.5rem;
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .hourly-time {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .hourly-temp {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 0.5rem 0;
+        }
+
+        .scroll-hint {
+            text-align: center;
+            color: var(--text-hint);
+            font-size: 12px;
+            padding: 0.5rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.25rem;
+        }
+
+        .daily-forecast {
+            margin: 0 1rem 2rem;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .daily-item {
+            background-color: var(--card-bg);
+            padding: 1rem 0.5rem;
+            text-align: center;
+            box-shadow: var(--card-shadow);
+        }
+
+        .daily-day {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .daily-date {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .daily-icon {
+            font-size: 24px;
+            margin: 0.5rem 0;
+        }
+
+        .daily-temp {
+            font-size: 14px;
+        }
+
+        .last-update {
+            text-align: center;
+            color: var(--text-hint);
+            font-size: 12px;
+            padding: 1rem 0 2rem;
+        }
+
+        .nav-bar {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            max-width: 414px;
+            background-color: var(--bg-color);
+            display: flex;
+            justify-content: space-around;
+            padding: 0.75rem 0;
+            border-top: 1px solid var(--divider);
+        }
+
+        .back-link {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            color: var(--primary-color);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            z-index: 10;
+        }
+
+        .theme-switch {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+            border: none;
+            border-radius: 4px;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            font-size: 14px;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-link">← 返回首页</a>
+    <a href="mobile-light.html" class="theme-switch">切换到明亮主题</a>
+    
+    <div class="container">
+        <div class="header">
+            <div class="header-left">
+                <span class="city-name">北京市</span>
+                <span class="weather-icon">☀️</span>
+                <span class="dropdown-icon">▼</span>
+            </div>
+            <div class="header-right">
+                2023年3月27日 周一 15:30
+            </div>
+        </div>
+
+        <div class="main-temp">
+            <h1 class="temp-value">23°C</h1>
+            <p class="weather-desc">晴朗</p>
+            <div class="temp-details">
+                <span>体感温度: 22°C</span>
+                <span>↑24°C ↓15°C</span>
+            </div>
+        </div>
+
+        <div class="collapsible">
+            <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                <h3 class="collapsible-title">详细信息</h3>
+                <span class="collapsible-icon">▼</span>
+            </div>
+            <div class="collapsible-content">
+                <div class="detail-item">
+                    <span class="detail-icon">💨</span>
+                    <span>西北风 3级</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-icon">💧</span>
+                    <span>相对湿度 45%</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-icon">🔍</span>
+                    <span>能见度 10km</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-icon">📊</span>
+                    <span>气压 1015hPa</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-icon">🌅</span>
+                    <span>日出 06:12 🌇 日落 18:48</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-icon">☔</span>
+                    <span>降水概率 10%</span>
+                </div>
+            </div>
+        </div>
+
+        <h3 class="section-title">今日预报</h3>
+        <div class="hourly-forecast">
+            <div class="hourly-item">
+                <div class="hourly-time">16时</div>
+                <div class="hourly-icon">☀️</div>
+                <div class="hourly-temp">23°</div>
+            </div>
+            <div class="hourly-item">
+                <div class="hourly-time">17时</div>
+                <div class="hourly-icon">☀️</div>
+                <div class="hourly-temp">21°</div>
+            </div>
+            <div class="hourly-item">
+                <div class="hourly-time">18时</div>
+                <div class="hourly-icon">🌤️</div>
+                <div class="hourly-temp">19°</div>
+            </div>
+            <div class="hourly-item">
+                <div class="hourly-time">19时</div>
+                <div class="hourly-icon">🌙</div>
+                <div class="hourly-temp">17°</div>
+            </div>
+            <div class="hourly-item">
+                <div class="hourly-time">20时</div>
+                <div class="hourly-icon">🌙</div>
+                <div class="hourly-temp">16°</div>
+            </div>
+            <div class="hourly-item">
+                <div class="hourly-time">21时</div>
+                <div class="hourly-icon">🌙</div>
+                <div class="hourly-temp">15°</div>
+            </div>
+            <div class="hourly-item">
+                <div class="hourly-time">22时</div>
+                <div class="hourly-icon">🌙</div>
+                <div class="hourly-temp">14°</div>
+            </div>
+            <div class="hourly-item">
+                <div class="hourly-time">23时</div>
+                <div class="hourly-icon">🌙</div>
+                <div class="hourly-temp">14°</div>
+            </div>
+        </div>
+        <div class="scroll-hint">
+            <span>◀</span>
+            <span>滑动查看更多</span>
+            <span>▶</span>
+        </div>
+
+        <h3 class="section-title">未来3天</h3>
+        <div class="daily-forecast">
+            <div class="daily-item">
+                <div class="daily-day">周二</div>
+                <div class="daily-date">3/28</div>
+                <div class="daily-icon">☀️</div>
+                <div class="daily-temp">25°/14°</div>
+            </div>
+            <div class="daily-item">
+                <div class="daily-day">周三</div>
+                <div class="daily-date">3/29</div>
+                <div class="daily-icon">⛅</div>
+                <div class="daily-temp">23°/12°</div>
+            </div>
+            <div class="daily-item">
+                <div class="daily-day">周四</div>
+                <div class="daily-date">3/30</div>
+                <div class="daily-icon">🌧️</div>
+                <div class="daily-temp">20°/10°</div>
+            </div>
+        </div>
+
+        <div class="last-update">
+            最后更新: 15:15
+        </div>
+    </div>
+
+    <script>
+        function toggleCollapsible(element) {
+            const content = element.nextElementSibling;
+            const icon = element.querySelector('.collapsible-icon');
+            
+            if (content.style.display === 'block') {
+                content.style.display = 'none';
+                icon.style.transform = 'rotate(0deg)';
+            } else {
+                content.style.display = 'block';
+                icon.style.transform = 'rotate(180deg)';
+            }
+        }
+
+        // 模拟用户点击城市名称
+        document.querySelector('.header-left').addEventListener('click', function() {
+            window.location.href = 'city-selection.html';
+        });
+
+        // 让水平滚动更直观
+        const hourlyForecast = document.querySelector('.hourly-forecast');
+        let isDown = false;
+        let startX;
+        let scrollLeft;
+
+        hourlyForecast.addEventListener('mousedown', (e) => {
+            isDown = true;
+            hourlyForecast.style.cursor = 'grabbing';
+            startX = e.pageX - hourlyForecast.offsetLeft;
+            scrollLeft = hourlyForecast.scrollLeft;
+        });
+
+        hourlyForecast.addEventListener('mouseleave', () => {
+            isDown = false;
+            hourlyForecast.style.cursor = 'grab';
+        });
+
+        hourlyForecast.addEventListener('mouseup', () => {
+            isDown = false;
+            hourlyForecast.style.cursor = 'grab';
+        });
+
+        hourlyForecast.addEventListener('mousemove', (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - hourlyForecast.offsetLeft;
+            const walk = (x - startX) * 2;
+            hourlyForecast.scrollLeft = scrollLeft - walk;
+        });
+    </script>
+</body>
+</html> 

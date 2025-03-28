@@ -1,0 +1,238 @@
+{
+  "100": {
+    "name": "晴",
+    "icon": "sunny"
+  },
+  "101": {
+    "name": "多云",
+    "icon": "cloudy"
+  },
+  "102": {
+    "name": "少云",
+    "icon": "partly-cloudy"
+  },
+  "103": {
+    "name": "晴间多云",
+    "icon": "partly-cloudy"
+  },
+  "104": {
+    "name": "阴",
+    "icon": "overcast"
+  },
+  "150": {
+    "name": "晴",
+    "icon": "clear-night"
+  },
+  "151": {
+    "name": "多云",
+    "icon": "cloudy-night"
+  },
+  "152": {
+    "name": "少云",
+    "icon": "partly-cloudy-night"
+  },
+  "153": {
+    "name": "晴间多云",
+    "icon": "partly-cloudy-night"
+  },
+  "154": {
+    "name": "阴",
+    "icon": "overcast"
+  },
+  "300": {
+    "name": "阵雨",
+    "icon": "shower-rain"
+  },
+  "301": {
+    "name": "强阵雨",
+    "icon": "heavy-shower-rain"
+  },
+  "302": {
+    "name": "雷阵雨",
+    "icon": "thundershower"
+  },
+  "303": {
+    "name": "强雷阵雨",
+    "icon": "heavy-thunderstorm"
+  },
+  "304": {
+    "name": "雷阵雨伴有冰雹",
+    "icon": "thundershower-with-hail"
+  },
+  "305": {
+    "name": "小雨",
+    "icon": "light-rain"
+  },
+  "306": {
+    "name": "中雨",
+    "icon": "moderate-rain"
+  },
+  "307": {
+    "name": "大雨",
+    "icon": "heavy-rain"
+  },
+  "308": {
+    "name": "极端降雨",
+    "icon": "extreme-rain"
+  },
+  "309": {
+    "name": "毛毛雨/细雨",
+    "icon": "drizzle-rain"
+  },
+  "310": {
+    "name": "暴雨",
+    "icon": "storm"
+  },
+  "311": {
+    "name": "大暴雨",
+    "icon": "heavy-storm"
+  },
+  "312": {
+    "name": "特大暴雨",
+    "icon": "severe-storm"
+  },
+  "313": {
+    "name": "冻雨",
+    "icon": "freezing-rain"
+  },
+  "314": {
+    "name": "小到中雨",
+    "icon": "light-to-moderate-rain"
+  },
+  "315": {
+    "name": "中到大雨",
+    "icon": "moderate-to-heavy-rain"
+  },
+  "316": {
+    "name": "大到暴雨",
+    "icon": "heavy-rain-to-storm"
+  },
+  "317": {
+    "name": "暴雨到大暴雨",
+    "icon": "storm-to-heavy-storm"
+  },
+  "318": {
+    "name": "大暴雨到特大暴雨",
+    "icon": "heavy-to-severe-storm"
+  },
+  "399": {
+    "name": "雨",
+    "icon": "rain"
+  },
+  "400": {
+    "name": "小雪",
+    "icon": "light-snow"
+  },
+  "401": {
+    "name": "中雪",
+    "icon": "moderate-snow"
+  },
+  "402": {
+    "name": "大雪",
+    "icon": "heavy-snow"
+  },
+  "403": {
+    "name": "暴雪",
+    "icon": "snowstorm"
+  },
+  "404": {
+    "name": "雨夹雪",
+    "icon": "sleet"
+  },
+  "405": {
+    "name": "雨雪天气",
+    "icon": "rain-and-snow"
+  },
+  "406": {
+    "name": "阵雨夹雪",
+    "icon": "shower-sleet"
+  },
+  "407": {
+    "name": "阵雪",
+    "icon": "snow-shower"
+  },
+  "408": {
+    "name": "小到中雪",
+    "icon": "light-to-moderate-snow"
+  },
+  "409": {
+    "name": "中到大雪",
+    "icon": "moderate-to-heavy-snow"
+  },
+  "410": {
+    "name": "大到暴雪",
+    "icon": "heavy-snow-to-snowstorm"
+  },
+  "499": {
+    "name": "雪",
+    "icon": "snow"
+  },
+  "500": {
+    "name": "薄雾",
+    "icon": "mist"
+  },
+  "501": {
+    "name": "雾",
+    "icon": "fog"
+  },
+  "502": {
+    "name": "霾",
+    "icon": "haze"
+  },
+  "503": {
+    "name": "扬沙",
+    "icon": "sand"
+  },
+  "504": {
+    "name": "浮尘",
+    "icon": "dust"
+  },
+  "507": {
+    "name": "沙尘暴",
+    "icon": "sandstorm"
+  },
+  "508": {
+    "name": "强沙尘暴",
+    "icon": "severe-sandstorm"
+  },
+  "509": {
+    "name": "浓雾",
+    "icon": "dense-fog"
+  },
+  "510": {
+    "name": "强浓雾",
+    "icon": "severe-fog"
+  },
+  "511": {
+    "name": "中度霾",
+    "icon": "moderate-haze"
+  },
+  "512": {
+    "name": "重度霾",
+    "icon": "heavy-haze"
+  },
+  "513": {
+    "name": "严重霾",
+    "icon": "severe-haze"
+  },
+  "514": {
+    "name": "大雾",
+    "icon": "heavy-fog"
+  },
+  "515": {
+    "name": "特强浓雾",
+    "icon": "extra-heavy-fog"
+  },
+  "900": {
+    "name": "热",
+    "icon": "hot"
+  },
+  "901": {
+    "name": "冷",
+    "icon": "cold"
+  },
+  "999": {
+    "name": "未知",
+    "icon": "unknown"
+  }
+} 

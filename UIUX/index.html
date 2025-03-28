@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>轻量版天气应用 - UI/UX设计展示</title>
+    <style>
+        :root {
+            --primary-color: #4A90E2;
+            --primary-light: #EBF4FD;
+            --primary-dark: #1A5BB6;
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --text-hint: #999999;
+            --bg-color: #FFFFFF;
+            --divider: #EEEEEE;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+            margin: 0;
+            padding: 0;
+            color: var(--text-primary);
+            background-color: var(--bg-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            border-bottom: 1px solid var(--divider);
+            padding-bottom: 1rem;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-weight: normal;
+            margin-top: 0;
+        }
+
+        .design-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .design-card {
+            border: 1px solid var(--divider);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .design-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-image {
+            width: 100%;
+            height: 200px;
+            background-color: var(--primary-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+            font-size: 3rem;
+        }
+
+        .card-content {
+            padding: 1.5rem;
+        }
+
+        .card-title {
+            margin-top: 0;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .card-description {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .card-link {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background-color: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        .card-link:hover {
+            background-color: var(--primary-dark);
+        }
+
+        footer {
+            margin-top: 3rem;
+            text-align: center;
+            padding: 1.5rem;
+            border-top: 1px solid var(--divider);
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .design-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>轻量版天气应用</h1>
+            <h2 class="subtitle">UI/UX设计展示</h2>
+            <p>本页面展示了基于PRD需求文档设计的轻量版天气应用UI/UX设计方案，采用极简看板风格，支持多种设备和主题。</p>
+        </header>
+
+        <main>
+            <h2>设计预览</h2>
+            <div class="design-grid">
+                <div class="design-card">
+                    <div class="card-image">📱</div>
+                    <div class="card-content">
+                        <h3 class="card-title">移动端设计 - 明亮主题</h3>
+                        <p class="card-description">移动端主页的明亮主题设计，采用单列垂直布局，突出显示关键天气信息。</p>
+                        <a href="mobile-light.html" class="card-link">查看设计</a>
+                    </div>
+                </div>
+
+                <div class="design-card">
+                    <div class="card-image">📱</div>
+                    <div class="card-content">
+                        <h3 class="card-title">移动端设计 - 暗黑主题</h3>
+                        <p class="card-description">移动端主页的暗黑主题设计，减少夜间使用的视觉疲劳。</p>
+                        <a href="mobile-dark.html" class="card-link">查看设计</a>
+                    </div>
+                </div>
+
+                <div class="design-card">
+                    <div class="card-image">📱</div>
+                    <div class="card-content">
+                        <h3 class="card-title">城市选择界面</h3>
+                        <p class="card-description">移动端的城市选择界面，支持省市两级选择和搜索功能。</p>
+                        <a href="city-selection.html" class="card-link">查看设计</a>
+                    </div>
+                </div>
+
+                <div class="design-card">
+                    <div class="card-image">📱</div>
+                    <div class="card-content">
+                        <h3 class="card-title">定位失败提示</h3>
+                        <p class="card-description">当自动定位失败时的友好提示界面。</p>
+                        <a href="location-failed.html" class="card-link">查看设计</a>
+                    </div>
+                </div>
+
+                <div class="design-card">
+                    <div class="card-image">💻</div>
+                    <div class="card-content">
+                        <h3 class="card-title">平板端设计</h3>
+                        <p class="card-description">针对平板设备优化的两列混合布局设计。</p>
+                        <a href="tablet.html" class="card-link">查看设计</a>
+                    </div>
+                </div>
+
+                <div class="design-card">
+                    <div class="card-image">🖥️</div>
+                    <div class="card-content">
+                        <h3 class="card-title">PC端设计</h3>
+                        <p class="card-description">针对大屏幕优化的三列网格布局设计。</p>
+                        <a href="desktop.html" class="card-link">查看设计</a>
+                    </div>
+                </div>
+            </div>
+
+            <h2 style="margin-top: 3rem;">设计系统</h2>
+            <p>完整的设计系统规范定义了应用的视觉语言，确保设计的一致性和可扩展性。</p>
+            <a href="design-system.html" class="card-link">查看设计系统</a>
+        </main>
+
+        <footer>
+            <p>轻量版天气应用 - UI/UX设计 &copy; 2023</p>
+        </footer>
+    </div>
+</body>
+</html> 

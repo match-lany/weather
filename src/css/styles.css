@@ -1,0 +1,22 @@
+/* 加载和风天气图标字体 */
+@font-face {
+  font-family: "qweather-icons";
+  src: url("../assets/font/qweather-icons.woff2") format("woff2"),
+       url("../assets/font/qweather-icons.woff") format("woff"),
+       url("../assets/font/qweather-icons.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* 设置图标的基本样式 */
+.weather-icon, .hourly-icon, .forecast-icon {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+/* 当前天气部分中的图标样式 */
+.weather-info .weather-icon {
+  width: 64px;
+  height: 64px;
+} 
