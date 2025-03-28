@@ -2,10 +2,10 @@
   "version": 2,
   "functions": {
     "api/routes/weatherRoutes.js": {
-      "runtime": "nodejs18.x"
+      "runtime": "@vercel/node@1.15.4"
     },
     "api/routes/cityRoutes.js": {
-      "runtime": "nodejs18.x"
+      "runtime": "@vercel/node@1.15.4"
     }
   },
   "routes": [
