@@ -11,11 +11,11 @@
   "routes": [
     { "src": "/api/weather/(.*)", "dest": "/api/routes/weatherRoutes.js" },
     { "src": "/api/cities/(.*)", "dest": "/api/routes/cityRoutes.js" },
-    { "src": "/js/(.*)", "dest": "src/js/$1" },
-    { "src": "/css/(.*)", "dest": "src/css/$1" },
-    { "src": "/assets/(.*)", "dest": "src/assets/$1" },
-    { "src": "/(.*\\.(json|ico|png|svg|jpg|jpeg|gif))", "dest": "src/$1" },
-    { "src": "/(.*)", "dest": "src/$1" },
-    { "src": "/", "dest": "src/index.html" }
+    { "src": "/js/(.*)", "dest": "/js/$1" },
+    { "src": "/css/(.*)", "dest": "/css/$1" },
+    { "src": "/assets/(.*)", "dest": "/assets/$1" },
+    { "src": "/(.*\\.(json|ico|png|svg|jpg|jpeg|gif))", "dest": "/$1" },
+    { "src": "/(.*)", "dest": "/$1" },
+    { "src": "/", "dest": "/index.html" }
   ]
 } 
