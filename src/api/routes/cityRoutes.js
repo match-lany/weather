@@ -10,7 +10,7 @@ const router = express.Router();
 const cache = new NodeCache({ stdTTL: 7 * 24 * 60 * 60, checkperiod: 600 }); // 默认缓存7天
 
 // 和风天气API配置
-const WEATHER_API_KEY = process.env.WEATHER_API_KEY || '2699c0e0c6b94d188b1c207f46547b5a';
+const WEATHER_API_KEY = process.env.WEATHER_API_KEY;
 
 /**
  * 获取所有城市列表

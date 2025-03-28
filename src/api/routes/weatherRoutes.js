@@ -10,7 +10,7 @@ const router = express.Router();
 const cache = new NodeCache({ stdTTL: 1800, checkperiod: 120 }); // 默认缓存30分钟
 
 // 和风天气API配置
-const WEATHER_API_KEY = process.env.WEATHER_API_KEY || '2699c0e0c6b94d188b1c207f46547b5a';
+const WEATHER_API_KEY = process.env.WEATHER_API_KEY;
 const WEATHER_API_BASE = 'https://devapi.qweather.com/v7';
 
 /**
