@@ -15,7 +15,7 @@ async function loadWeatherData(city) {
     // 并行请求各类天气数据
     const [current, forecast, hourly] = await Promise.all([
       getCurrentWeather(city),
-      getWeatherForecast(city),
+      getForecast(city),
       getHourlyForecast(city)
     ]);
     
