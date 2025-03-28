@@ -280,7 +280,16 @@ function renderCurrentWeather(data) {
  */
 function renderHourlyForecast(data) {
   const container = document.getElementById('hourly-forecast');
-  if (!container || !data || data.length === 0) return;
+  if (!container || !data) return;
+  
+  // 确保data是数组
+  if (!Array.isArray(data)) {
+    console.error('小时预报数据不是数组:', data);
+    return;
+  }
+  
+  // 如果数组为空，直接返回
+  if (data.length === 0) return;
   
   // 只显示24小时
   const hourlyData = data.slice(0, 24);
@@ -302,7 +311,16 @@ function renderHourlyForecast(data) {
  */
 function renderDailyForecast(data) {
   const container = document.getElementById('daily-forecast');
-  if (!container || !data || data.length === 0) return;
+  if (!container || !data) return;
+  
+  // 确保data是数组
+  if (!Array.isArray(data)) {
+    console.error('每日预报数据不是数组:', data);
+    return;
+  }
+  
+  // 如果数组为空，直接返回
+  if (data.length === 0) return;
   
   // 最多显示7天
   const forecastData = data.slice(0, 7);
