@@ -265,16 +265,38 @@ if (process.env.VERCEL) {
       return res.status(200).end();
     }
 
-    const url = req.url.replace(/^\/api\/weather/, '').replace(/\?.*$/, '') || '/current';
-    const handler = router[`GET_${url}`];
-    
-    if (handler) {
-      return handler(req, res);
-    } else {
-      return res.status(404).json({ 
-        status: 'error', 
-        message: 'API路由不存在' 
-      });
+    // 打印请求信息以便调试
+    console.log(`处理请求: ${req.url}`);
+    console.log(`查询参数:`, req.query);
+
+    // 解析endpoint和其他参数
+    const endpoint = req.query.endpoint || 'current';
+    const city = req.query.city;
+    const days = req.query.days || 3;
+
+    // 根据endpoint调用对应的路由处理函数
+    try {
+      if (endpoint === 'current') {
+        if (!router["GET_/current"]) {
+          return res.status(404).json({ error: 'API路由不存在' });
+        }
+        return router["GET_/current"](req, res);
+      } else if (endpoint === 'forecast') {
+        if (!router["GET_/forecast"]) {
+          return res.status(404).json({ error: 'API路由不存在' });
+        }
+        return router["GET_/forecast"](req, res);
+      } else if (endpoint === 'hourly') {
+        if (!router["GET_/hourly"]) {
+          return res.status(404).json({ error: 'API路由不存在' });
+        }
+        return router["GET_/hourly"](req, res);
+      } else {
+        return res.status(400).json({ error: '不支持的天气接口' });
+      }
+    } catch (error) {
+      console.error('API处理错误:', error);
+      return res.status(500).json({ error: '处理请求时发生错误' });
     }
   };
 } else {

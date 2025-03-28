@@ -290,16 +290,39 @@ if (process.env.VERCEL) {
       return res.status(200).end();
     }
 
-    const url = req.url.replace(/^\/api\/cities/, '').replace(/\?.*$/, '') || '/search';
-    const handler = router[`GET_${url}`];
+    // 打印请求信息以便调试
+    console.log(`处理城市请求: ${req.url}`);
+    console.log(`查询参数:`, req.query);
+
+    // 解析endpoint和其他参数
+    const endpoint = req.query.endpoint || 'search';
     
-    if (handler) {
-      return handler(req, res);
-    } else {
-      return res.status(404).json({ 
-        status: 'error', 
-        message: 'API路由不存在' 
-      });
+    // 根据endpoint调用对应的路由处理函数
+    try {
+      if (endpoint === 'search') {
+        if (!router["GET_/search"]) {
+          return res.status(404).json({ error: 'API路由不存在' });
+        }
+        return router["GET_/search"](req, res);
+      } else if (endpoint === 'all') {
+        if (!router["GET_/all"]) {
+          return res.status(404).json({ error: 'API路由不存在' });
+        }
+        return router["GET_/all"](req, res);
+      } else if (endpoint === 'locate') {
+        if (!router["GET_/locate"]) {
+          return res.status(404).json({ error: 'API路由不存在' });
+        }
+        return router["GET_/locate"](req, res);
+      } else if (endpoint === 'hot') {
+        // 热门城市可能未实现
+        return res.status(501).json({ error: '热门城市功能尚未实现' });
+      } else {
+        return res.status(400).json({ error: '不支持的城市接口' });
+      }
+    } catch (error) {
+      console.error('城市API处理错误:', error);
+      return res.status(500).json({ error: '处理请求时发生错误' });
     }
   };
 } else {

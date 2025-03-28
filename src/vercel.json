@@ -9,9 +9,13 @@
     }
   },
   "routes": [
-    { "src": "/api/weather/(.*)", "dest": "api/routes/weatherRoutes.js" },
-    { "src": "/api/cities/(.*)", "dest": "api/routes/cityRoutes.js" },
-    { "src": "/(.*)", "dest": "$1" },
-    { "src": "/", "dest": "index.html" }
+    { "src": "/api/weather/(.*)", "dest": "/api/routes/weatherRoutes.js" },
+    { "src": "/api/cities/(.*)", "dest": "/api/routes/cityRoutes.js" },
+    { "src": "/js/(.*)", "dest": "/js/$1" },
+    { "src": "/css/(.*)", "dest": "/css/$1" },
+    { "src": "/assets/(.*)", "dest": "/assets/$1" },
+    { "src": "/(.*\\.(json|ico|png|svg|jpg|jpeg|gif))", "dest": "/$1" },
+    { "src": "/(.*)", "dest": "/$1" },
+    { "src": "/", "dest": "/index.html" }
   ]
 } 
