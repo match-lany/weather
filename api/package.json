@@ -1,0 +1,9 @@
+{
+  "name": "weather-app-api",
+  "version": "1.0.0",
+  "description": "Weather App Serverless API",
+  "main": "index.js",
+  "dependencies": {
+    "axios": "^0.24.0"
+  }
+} 

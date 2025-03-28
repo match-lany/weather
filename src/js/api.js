@@ -3,8 +3,8 @@
  * 负责与后端API进行通信
  */
 
-// API基础URL
-const BASE_URL = 'http://localhost:3000/api';
+// API基础URL，检测当前环境，在生产环境中使用相对路径
+const BASE_URL = window.location.hostname === 'localhost' ? 'http://localhost:3000/api' : '/api';
 
 // 默认缓存时间
 const DEFAULT_CACHE_TIME = {
@@ -58,7 +58,7 @@ async function apiRequest(url, options = {}, cacheKey = null, cacheTime = 0) {
 async function getCurrentWeather(city) {
   const cacheKey = `weather_current_${city}`;
   return apiRequest(
-    `${BASE_URL}/weather/current?city=${encodeURIComponent(city)}`, 
+    `${BASE_URL}/weather?endpoint=current&city=${encodeURIComponent(city)}`, 
     {}, 
     cacheKey, 
     DEFAULT_CACHE_TIME.current
@@ -74,7 +74,7 @@ async function getCurrentWeather(city) {
 async function getWeatherForecast(city, days = 3) {
   const cacheKey = `weather_forecast_${city}_${days}`;
   return apiRequest(
-    `${BASE_URL}/weather/forecast?city=${encodeURIComponent(city)}&days=${days}`, 
+    `${BASE_URL}/weather?endpoint=forecast&city=${encodeURIComponent(city)}&days=${days}`, 
     {}, 
     cacheKey, 
     DEFAULT_CACHE_TIME.forecast
@@ -89,7 +89,7 @@ async function getWeatherForecast(city, days = 3) {
 async function getHourlyForecast(city) {
   const cacheKey = `weather_hourly_${city}`;
   return apiRequest(
-    `${BASE_URL}/weather/hourly?city=${encodeURIComponent(city)}`, 
+    `${BASE_URL}/weather?endpoint=hourly&city=${encodeURIComponent(city)}`, 
     {}, 
     cacheKey, 
     DEFAULT_CACHE_TIME.hourly
@@ -103,7 +103,7 @@ async function getHourlyForecast(city) {
 async function getCityList() {
   const cacheKey = 'city_list';
   return apiRequest(
-    `${BASE_URL}/cities/all`, 
+    `${BASE_URL}/cities?endpoint=all`, 
     {}, 
     cacheKey, 
     DEFAULT_CACHE_TIME.cities
@@ -117,7 +117,7 @@ async function getCityList() {
  */
 async function searchCity(keyword) {
   return apiRequest(
-    `${BASE_URL}/cities/search?keyword=${encodeURIComponent(keyword)}`
+    `${BASE_URL}/cities?endpoint=search&keyword=${encodeURIComponent(keyword)}`
   );
 }
 
@@ -129,7 +129,7 @@ async function searchCity(keyword) {
  */
 async function getCityByLocation(lat, lon) {
   return apiRequest(
-    `${BASE_URL}/cities/locate?lat=${lat}&lon=${lon}`
+    `${BASE_URL}/cities?endpoint=locate&lat=${lat}&lon=${lon}`
   );
 }
 
@@ -140,11 +140,56 @@ async function getCityByLocation(lat, lon) {
 async function getHotCities() {
   const cacheKey = 'hot_cities';
   return apiRequest(
-    `${BASE_URL}/cities/hot`, 
+    `${BASE_URL}/cities?endpoint=hot`, 
     {}, 
     cacheKey, 
     DEFAULT_CACHE_TIME.cities
   );
+}
+
+/**
+ * 从localStorage获取数据
+ * @param {string} key - 存储键名
+ * @returns {any|null} 存储的数据或null
+ */
+function getFromStorage(key) {
+  try {
+    const item = localStorage.getItem(key);
+    if (!item) return null;
+    
+    const data = JSON.parse(item);
+    const now = new Date().getTime();
+    
+    // 检查是否过期
+    if (data.expiry && data.expiry < now) {
+      localStorage.removeItem(key);
+      return null;
+    }
+    
+    return data.value;
+  } catch (error) {
+    console.error('从缓存获取数据失败:', error);
+    return null;
+  }
+}
+
+/**
+ * 保存数据到localStorage
+ * @param {string} key - 存储键名
+ * @param {any} value - 要存储的数据
+ * @param {number} ttl - 过期时间（毫秒）
+ */
+function saveToStorage(key, value, ttl) {
+  try {
+    const now = new Date().getTime();
+    const item = {
+      value: value,
+      expiry: now + ttl
+    };
+    localStorage.setItem(key, JSON.stringify(item));
+  } catch (error) {
+    console.error('保存数据到缓存失败:', error);
+  }
 }
 
 /**

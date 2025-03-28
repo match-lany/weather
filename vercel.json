@@ -1,19 +1,13 @@
 {
   "version": 2,
   "builds": [
-    {
-      "src": "src/**",
-      "use": "@vercel/static"
-    }
+    { "src": "api/*.js", "use": "@vercel/node" },
+    { "src": "src/**", "use": "@vercel/static" }
   ],
   "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/src/$1"
-    },
-    {
-      "src": "/",
-      "dest": "/src/index.html"
-    }
+    { "src": "/api/weather", "dest": "/api/weather.js" },
+    { "src": "/api/cities", "dest": "/api/cities.js" },
+    { "src": "/(.*)", "dest": "/src/$1" },
+    { "src": "/", "dest": "/src/index.html" }
   ]
 } 
