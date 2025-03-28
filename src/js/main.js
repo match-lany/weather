@@ -41,7 +41,7 @@ function updateCityDisplay(cityName) {
 function registerServiceWorker() {
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js')
+      navigator.serviceWorker.register('./sw.js')
         .then(registration => {
           console.log('ServiceWorker注册成功:', registration.scope);
         })

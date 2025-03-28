@@ -51,49 +51,58 @@ async function apiRequest(url, options = {}, cacheKey = null, cacheTime = 0) {
 }
 
 /**
- * 获取当前天气数据
+ * 获取当前天气
  * @param {string} city - 城市名称
  * @returns {Promise<Object>} 当前天气数据
  */
 async function getCurrentWeather(city) {
-  const cacheKey = `weather_current_${city}`;
-  return apiRequest(
-    `${BASE_URL}/weather?endpoint=current&city=${encodeURIComponent(city)}`, 
-    {}, 
-    cacheKey, 
-    DEFAULT_CACHE_TIME.current
-  );
+  try {
+    const response = await fetch(`/api/weather?endpoint=current&city=${encodeURIComponent(city)}`);
+    if (!response.ok) {
+      throw new Error(`API请求失败: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('获取当前天气失败:', error);
+    throw error;
+  }
 }
 
 /**
- * 获取天气预报数据
+ * 获取天气预报
  * @param {string} city - 城市名称
- * @param {number} days - 预报天数，默认3天
+ * @param {number} days - 预报天数，默认为3
  * @returns {Promise<Object>} 天气预报数据
  */
-async function getWeatherForecast(city, days = 3) {
-  const cacheKey = `weather_forecast_${city}_${days}`;
-  return apiRequest(
-    `${BASE_URL}/weather?endpoint=forecast&city=${encodeURIComponent(city)}&days=${days}`, 
-    {}, 
-    cacheKey, 
-    DEFAULT_CACHE_TIME.forecast
-  );
+async function getForecast(city, days = 3) {
+  try {
+    const response = await fetch(`/api/weather?endpoint=forecast&city=${encodeURIComponent(city)}&days=${days}`);
+    if (!response.ok) {
+      throw new Error(`API请求失败: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('获取天气预报失败:', error);
+    throw error;
+  }
 }
 
 /**
- * 获取小时预报数据
+ * 获取逐小时预报
  * @param {string} city - 城市名称
  * @returns {Promise<Object>} 小时预报数据
  */
 async function getHourlyForecast(city) {
-  const cacheKey = `weather_hourly_${city}`;
-  return apiRequest(
-    `${BASE_URL}/weather?endpoint=hourly&city=${encodeURIComponent(city)}`, 
-    {}, 
-    cacheKey, 
-    DEFAULT_CACHE_TIME.hourly
-  );
+  try {
+    const response = await fetch(`/api/weather?endpoint=hourly&city=${encodeURIComponent(city)}`);
+    if (!response.ok) {
+      throw new Error(`API请求失败: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('获取小时预报失败:', error);
+    throw error;
+  }
 }
 
 /**
@@ -113,24 +122,38 @@ async function getCityList() {
 /**
  * 搜索城市
  * @param {string} keyword - 搜索关键词
- * @returns {Promise<Array>} 搜索结果
+ * @returns {Promise<Array>} 城市搜索结果
  */
 async function searchCity(keyword) {
-  return apiRequest(
-    `${BASE_URL}/cities?endpoint=search&keyword=${encodeURIComponent(keyword)}`
-  );
+  try {
+    const response = await fetch(`/api/cities?endpoint=search&keyword=${encodeURIComponent(keyword)}`);
+    if (!response.ok) {
+      throw new Error(`API请求失败: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('搜索城市失败:', error);
+    throw error;
+  }
 }
 
 /**
- * 根据地理位置获取城市
+ * 根据经纬度获取城市
  * @param {number} lat - 纬度
  * @param {number} lon - 经度
  * @returns {Promise<Object>} 城市信息
  */
 async function getCityByLocation(lat, lon) {
-  return apiRequest(
-    `${BASE_URL}/cities?endpoint=locate&lat=${lat}&lon=${lon}`
-  );
+  try {
+    const response = await fetch(`/api/cities?endpoint=locate&lat=${lat}&lon=${lon}`);
+    if (!response.ok) {
+      throw new Error(`API请求失败: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('获取城市失败:', error);
+    throw error;
+  }
 }
 
 /**
@@ -138,13 +161,16 @@ async function getCityByLocation(lat, lon) {
  * @returns {Promise<Array>} 热门城市列表
  */
 async function getHotCities() {
-  const cacheKey = 'hot_cities';
-  return apiRequest(
-    `${BASE_URL}/cities?endpoint=hot`, 
-    {}, 
-    cacheKey, 
-    DEFAULT_CACHE_TIME.cities
-  );
+  try {
+    const response = await fetch(`/api/cities?endpoint=hot`);
+    if (!response.ok) {
+      throw new Error(`API请求失败: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('获取热门城市失败:', error);
+    throw error;
+  }
 }
 
 /**
@@ -207,7 +233,7 @@ async function refreshWeatherData(city) {
     // 重新获取数据
     const [current, forecast, hourly] = await Promise.all([
       getCurrentWeather(city),
-      getWeatherForecast(city),
+      getForecast(city),
       getHourlyForecast(city)
     ]);
     

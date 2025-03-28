@@ -5,8 +5,9 @@
     { "src": "api/routes/*.js", "use": "@vercel/node" }
   ],
   "routes": [
-    { "src": "/api/weather/(.*)", "dest": "/api/routes/weatherRoutes.js" },
-    { "src": "/api/cities/(.*)", "dest": "/api/routes/cityRoutes.js" },
+    { "src": "/api/weather", "dest": "/api/routes/weatherRoutes.js" },
+    { "src": "/api/cities", "dest": "/api/routes/cityRoutes.js" },
+    { "src": "/assets/(.*)", "dest": "/assets/$1" },
     { "src": "/(.*)", "dest": "/$1" }
   ]
 } 
