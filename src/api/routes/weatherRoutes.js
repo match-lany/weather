@@ -6,7 +6,14 @@ const express = require('express');
 const axios = require('axios');
 const NodeCache = require('node-cache');
 
-const router = express.Router();
+// 支持Vercel Serverless Functions和Express双重环境
+let router;
+if (typeof express === 'function') {
+  router = express.Router();
+} else {
+  router = { get: (path, handler) => { router[`GET_${path}`] = handler; } };
+}
+
 const cache = new NodeCache({ stdTTL: 1800, checkperiod: 120 }); // 默认缓存30分钟
 
 // 和风天气API配置
@@ -71,6 +78,11 @@ router.get('/current', async (req, res) => {
       vis: response.data.now.vis,
       updateTime: response.data.updateTime
     };
+    
+    // 设置缓存头
+    if (process.env.VERCEL) {
+      res.setHeader('Cache-Control', 's-maxage=1800, stale-while-revalidate');
+    }
     
     // 存入缓存
     cache.set(cacheKey, weatherData, 1800); // 缓存30分钟
@@ -210,20 +222,12 @@ router.get('/hourly', async (req, res) => {
 });
 
 /**
- * 通过城市名称获取城市ID
- * @param {string} cityName - 城市名称
+ * 获取城市ID工具函数
+ * @param {string} cityName - 城市名称 
  * @returns {Promise<Object|null>} 城市信息
  */
 async function getCityId(cityName) {
   try {
-    // 先从缓存中查找
-    const cacheKey = `city_id_${cityName}`;
-    const cachedData = cache.get(cacheKey);
-    if (cachedData) {
-      return cachedData;
-    }
-    
-    // 请求和风天气API
     const response = await axios.get('https://geoapi.qweather.com/v2/city/lookup', {
       params: {
         location: cityName,
@@ -235,21 +239,45 @@ async function getCityId(cityName) {
       return null;
     }
     
-    const cityData = {
+    return {
       id: response.data.location[0].id,
-      name: response.data.location[0].name,
-      lat: response.data.location[0].lat,
-      lon: response.data.location[0].lon
+      name: response.data.location[0].name
     };
-    
-    // 存入缓存（7天）
-    cache.set(cacheKey, cityData, 7 * 24 * 60 * 60);
-    
-    return cityData;
   } catch (error) {
     console.error('获取城市ID失败:', error);
     return null;
   }
 }
 
-module.exports = router; 
+// Vercel Serverless Function 处理
+if (process.env.VERCEL) {
+  module.exports = async (req, res) => {
+    // 设置CORS头
+    res.setHeader('Access-Control-Allow-Credentials', true);
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
+    res.setHeader(
+      'Access-Control-Allow-Headers',
+      'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
+    );
+
+    if (req.method === 'OPTIONS') {
+      return res.status(200).end();
+    }
+
+    const url = req.url.replace(/^\/api\/weather/, '').replace(/\?.*$/, '') || '/current';
+    const handler = router[`GET_${url}`];
+    
+    if (handler) {
+      return handler(req, res);
+    } else {
+      return res.status(404).json({ 
+        status: 'error', 
+        message: 'API路由不存在' 
+      });
+    }
+  };
+} else {
+  // Express环境导出路由
+  module.exports = router;
+} 

@@ -2,6 +2,8 @@
  * API服务入口文件
  */
 
+// 这个文件对Vercel Serverless Functions不是必需的，但对本地开发很有用
+
 const express = require('express');
 const cors = require('cors');
 const weatherRoutes = require('./routes/weatherRoutes');

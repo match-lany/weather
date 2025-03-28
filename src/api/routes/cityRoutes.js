@@ -6,7 +6,14 @@ const express = require('express');
 const axios = require('axios');
 const NodeCache = require('node-cache');
 
-const router = express.Router();
+// 支持Vercel Serverless Functions和Express双重环境
+let router;
+if (typeof express === 'function') {
+  router = express.Router();
+} else {
+  router = { get: (path, handler) => { router[`GET_${path}`] = handler; } };
+}
+
 const cache = new NodeCache({ stdTTL: 7 * 24 * 60 * 60, checkperiod: 600 }); // 默认缓存7天
 
 // 和风天气API配置
@@ -72,6 +79,11 @@ router.get('/all', async (req, res) => {
       };
     });
     
+    // 设置缓存头（Vercel）
+    if (process.env.VERCEL) {
+      res.setHeader('Cache-Control', 's-maxage=604800, stale-while-revalidate');
+    }
+    
     // 存入缓存
     cache.set(cacheKey, result, 7 * 24 * 60 * 60); // 缓存7天
     
@@ -128,6 +140,11 @@ router.get('/search', async (req, res) => {
       lat: city.lat,
       lon: city.lon
     }));
+    
+    // 设置缓存头（Vercel）
+    if (process.env.VERCEL) {
+      res.setHeader('Cache-Control', 's-maxage=86400, stale-while-revalidate');
+    }
     
     // 存入缓存
     cache.set(cacheKey, cities, 24 * 60 * 60); // 缓存24小时
@@ -187,6 +204,11 @@ router.get('/locate', async (req, res) => {
       lat: response.data.location[0].lat,
       lon: response.data.location[0].lon
     };
+    
+    // 设置缓存头（Vercel）
+    if (process.env.VERCEL) {
+      res.setHeader('Cache-Control', 's-maxage=86400, stale-while-revalidate');
+    }
     
     // 存入缓存
     cache.set(cacheKey, city, 24 * 60 * 60); // 缓存24小时
@@ -252,4 +274,35 @@ function getMockCitiesForProvince(provinceCode, provinceName) {
   return mockCities[provinceCode] || [];
 }
 
-module.exports = router; 
+// Vercel Serverless Function 处理
+if (process.env.VERCEL) {
+  module.exports = async (req, res) => {
+    // 设置CORS头
+    res.setHeader('Access-Control-Allow-Credentials', true);
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
+    res.setHeader(
+      'Access-Control-Allow-Headers',
+      'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
+    );
+
+    if (req.method === 'OPTIONS') {
+      return res.status(200).end();
+    }
+
+    const url = req.url.replace(/^\/api\/cities/, '').replace(/\?.*$/, '') || '/search';
+    const handler = router[`GET_${url}`];
+    
+    if (handler) {
+      return handler(req, res);
+    } else {
+      return res.status(404).json({ 
+        status: 'error', 
+        message: 'API路由不存在' 
+      });
+    }
+  };
+} else {
+  // Express环境导出路由
+  module.exports = router;
+} 
