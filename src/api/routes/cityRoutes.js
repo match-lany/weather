@@ -6,24 +6,67 @@ const express = require('express');
 const axios = require('axios');
 const NodeCache = require('node-cache');
 
-// 支持Vercel Serverless Functions和Express双重环境
-let router;
-if (typeof express === 'function') {
-  router = express.Router();
-} else {
-  router = { get: (path, handler) => { router[`GET_${path}`] = handler; } };
-}
-
+// 创建缓存实例
 const cache = new NodeCache({ stdTTL: 7 * 24 * 60 * 60, checkperiod: 600 }); // 默认缓存7天
 
 // 和风天气API配置
 const WEATHER_API_KEY = process.env.WEATHER_API_KEY;
 
+// 路由映射
+const routes = {
+  'search': handleSearch,
+  'all': handleAllCities,
+  'locate': handleLocate,
+  'hot': handleHotCities
+};
+
+// 主处理函数 - Vercel Serverless入口点
+module.exports = async (req, res) => {
+  // 设置CORS头
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
+
+  // 处理OPTIONS请求
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+
+  // 日志记录
+  console.log(`处理API请求: ${req.url}`);
+
+  try {
+    // 解析endpoint参数
+    const endpoint = req.query.endpoint;
+    console.log(`请求的endpoint: ${endpoint}`);
+
+    // 查找对应的处理函数
+    const handler = routes[endpoint];
+    
+    if (handler) {
+      // 调用对应的处理函数
+      await handler(req, res);
+    } else {
+      res.status(400).json({
+        status: 'error',
+        message: `不支持的endpoint: ${endpoint}`
+      });
+    }
+  } catch (error) {
+    console.error('API处理错误:', error);
+    res.status(500).json({
+      status: 'error',
+      message: '服务器内部错误'
+    });
+  }
+};
+
 /**
  * 获取所有城市列表
- * GET /api/cities/all
  */
-router.get('/all', async (req, res) => {
+async function handleAllCities(req, res) {
   try {
     // 尝试从缓存中获取
     const cacheKey = 'cities_all';
@@ -80,9 +123,7 @@ router.get('/all', async (req, res) => {
     });
     
     // 设置缓存头（Vercel）
-    if (process.env.VERCEL) {
-      res.setHeader('Cache-Control', 's-maxage=604800, stale-while-revalidate');
-    }
+    res.setHeader('Cache-Control', 's-maxage=604800, stale-while-revalidate');
     
     // 存入缓存
     cache.set(cacheKey, result, 7 * 24 * 60 * 60); // 缓存7天
@@ -95,13 +136,12 @@ router.get('/all', async (req, res) => {
       message: '获取城市列表失败'
     });
   }
-});
+}
 
 /**
  * 搜索城市
- * GET /api/cities/search?keyword=北京
  */
-router.get('/search', async (req, res) => {
+async function handleSearch(req, res) {
   try {
     const { keyword } = req.query;
     
@@ -142,9 +182,7 @@ router.get('/search', async (req, res) => {
     }));
     
     // 设置缓存头（Vercel）
-    if (process.env.VERCEL) {
-      res.setHeader('Cache-Control', 's-maxage=86400, stale-while-revalidate');
-    }
+    res.setHeader('Cache-Control', 's-maxage=86400, stale-while-revalidate');
     
     // 存入缓存
     cache.set(cacheKey, cities, 24 * 60 * 60); // 缓存24小时
@@ -157,13 +195,12 @@ router.get('/search', async (req, res) => {
       message: '搜索城市失败'
     });
   }
-});
+}
 
 /**
  * 根据地理位置获取城市
- * GET /api/cities/locate?lat=39.90&lon=116.40
  */
-router.get('/locate', async (req, res) => {
+async function handleLocate(req, res) {
   try {
     const { lat, lon } = req.query;
     
@@ -206,9 +243,7 @@ router.get('/locate', async (req, res) => {
     };
     
     // 设置缓存头（Vercel）
-    if (process.env.VERCEL) {
-      res.setHeader('Cache-Control', 's-maxage=86400, stale-while-revalidate');
-    }
+    res.setHeader('Cache-Control', 's-maxage=86400, stale-while-revalidate');
     
     // 存入缓存
     cache.set(cacheKey, city, 24 * 60 * 60); // 缓存24小时
@@ -221,13 +256,12 @@ router.get('/locate', async (req, res) => {
       message: '根据位置获取城市失败'
     });
   }
-});
+}
 
 /**
  * 获取热门城市
- * GET /api/cities/hot
  */
-router.get('/hot', (req, res) => {
+function handleHotCities(req, res) {
   // 热门城市列表
   const hotCities = [
     { id: '101010100', name: '北京' },
@@ -243,7 +277,7 @@ router.get('/hot', (req, res) => {
   ];
   
   res.json(hotCities);
-});
+}
 
 /**
  * 为省份生成模拟城市数据
@@ -252,80 +286,26 @@ router.get('/hot', (req, res) => {
  * @returns {Array} 城市列表
  */
 function getMockCitiesForProvince(provinceCode, provinceName) {
-  // 这里只是模拟数据，实际应用中应该调用和风天气API获取真实城市列表
-  const mockCities = {
-    '110000': [{ id: '101010100', name: '北京' }],
-    '120000': [{ id: '101030100', name: '天津' }],
-    '130000': [
-      { id: '101090101', name: '石家庄' },
-      { id: '101090201', name: '保定' },
-      { id: '101090301', name: '张家口' }
-    ],
-    '310000': [{ id: '101020100', name: '上海' }],
-    '440000': [
-      { id: '101280101', name: '广州' },
-      { id: '101280601', name: '深圳' },
-      { id: '101281001', name: '珠海' }
-    ],
-    '500000': [{ id: '101040100', name: '重庆' }]
-  };
+  // 根据省份代码的前两位，生成一些模拟城市
+  const prefix = provinceCode.substr(0, 2);
   
-  // 如果没有预设数据，返回一个空数组
-  return mockCities[provinceCode] || [];
-}
-
-// Vercel Serverless Function 处理
-if (process.env.VERCEL) {
-  module.exports = async (req, res) => {
-    // 设置CORS头
-    res.setHeader('Access-Control-Allow-Credentials', true);
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
-    res.setHeader(
-      'Access-Control-Allow-Headers',
-      'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
-    );
-
-    if (req.method === 'OPTIONS') {
-      return res.status(200).end();
-    }
-
-    // 打印请求信息以便调试
-    console.log(`处理城市请求: ${req.url}`);
-    console.log(`查询参数:`, req.query);
-
-    // 解析endpoint和其他参数
-    const endpoint = req.query.endpoint || 'search';
-    
-    // 根据endpoint调用对应的路由处理函数
-    try {
-      if (endpoint === 'search') {
-        if (!router["GET_/search"]) {
-          return res.status(404).json({ error: 'API路由不存在' });
-        }
-        return router["GET_/search"](req, res);
-      } else if (endpoint === 'all') {
-        if (!router["GET_/all"]) {
-          return res.status(404).json({ error: 'API路由不存在' });
-        }
-        return router["GET_/all"](req, res);
-      } else if (endpoint === 'locate') {
-        if (!router["GET_/locate"]) {
-          return res.status(404).json({ error: 'API路由不存在' });
-        }
-        return router["GET_/locate"](req, res);
-      } else if (endpoint === 'hot') {
-        // 热门城市可能未实现
-        return res.status(501).json({ error: '热门城市功能尚未实现' });
-      } else {
-        return res.status(400).json({ error: '不支持的城市接口' });
-      }
-    } catch (error) {
-      console.error('城市API处理错误:', error);
-      return res.status(500).json({ error: '处理请求时发生错误' });
-    }
-  };
-} else {
-  // Express环境导出路由
-  module.exports = router;
+  // 直辖市特殊处理
+  if (['11', '12', '31', '50'].includes(prefix)) {
+    return [
+      { id: `101${prefix}0100`, name: provinceName.replace('市', '') }
+    ];
+  }
+  
+  // 其他省份生成3-5个城市
+  const cities = [];
+  const cityCount = Math.floor(Math.random() * 3) + 3; // 3-5个城市
+  
+  for (let i = 1; i <= cityCount; i++) {
+    cities.push({
+      id: `101${prefix}${i.toString().padStart(2, '0')}00`,
+      name: `${provinceName.replace('省', '').replace('自治区', '')}城市${i}`
+    });
+  }
+  
+  return cities;
 } 

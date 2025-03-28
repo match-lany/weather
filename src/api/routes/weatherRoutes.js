@@ -6,25 +6,67 @@ const express = require('express');
 const axios = require('axios');
 const NodeCache = require('node-cache');
 
-// 支持Vercel Serverless Functions和Express双重环境
-let router;
-if (typeof express === 'function') {
-  router = express.Router();
-} else {
-  router = { get: (path, handler) => { router[`GET_${path}`] = handler; } };
-}
-
+// 创建缓存实例
 const cache = new NodeCache({ stdTTL: 1800, checkperiod: 120 }); // 默认缓存30分钟
 
 // 和风天气API配置
 const WEATHER_API_KEY = process.env.WEATHER_API_KEY;
 const WEATHER_API_BASE = 'https://devapi.qweather.com/v7';
 
+// 路由映射
+const routes = {
+  'current': handleCurrentWeather,
+  'forecast': handleForecast,
+  'hourly': handleHourly
+};
+
+// 主处理函数 - Vercel Serverless入口点
+module.exports = async (req, res) => {
+  // 设置CORS头
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
+
+  // 处理OPTIONS请求
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+
+  // 日志记录
+  console.log(`处理天气API请求: ${req.url}`);
+
+  try {
+    // 解析endpoint参数
+    const endpoint = req.query.endpoint;
+    console.log(`请求的endpoint: ${endpoint}`);
+
+    // 查找对应的处理函数
+    const handler = routes[endpoint];
+    
+    if (handler) {
+      // 调用对应的处理函数
+      await handler(req, res);
+    } else {
+      res.status(400).json({
+        status: 'error',
+        message: `不支持的endpoint: ${endpoint}`
+      });
+    }
+  } catch (error) {
+    console.error('API处理错误:', error);
+    res.status(500).json({
+      status: 'error',
+      message: '服务器内部错误'
+    });
+  }
+};
+
 /**
  * 获取当前天气
- * GET /api/weather/current?city=cityname
  */
-router.get('/current', async (req, res) => {
+async function handleCurrentWeather(req, res) {
   try {
     const { city } = req.query;
     
@@ -80,9 +122,7 @@ router.get('/current', async (req, res) => {
     };
     
     // 设置缓存头
-    if (process.env.VERCEL) {
-      res.setHeader('Cache-Control', 's-maxage=1800, stale-while-revalidate');
-    }
+    res.setHeader('Cache-Control', 's-maxage=1800, stale-while-revalidate');
     
     // 存入缓存
     cache.set(cacheKey, weatherData, 1800); // 缓存30分钟
@@ -95,13 +135,12 @@ router.get('/current', async (req, res) => {
       message: '获取天气数据失败'
     });
   }
-});
+}
 
 /**
  * 获取天气预报
- * GET /api/weather/forecast?city=cityname&days=3
  */
-router.get('/forecast', async (req, res) => {
+async function handleForecast(req, res) {
   try {
     const { city, days = 3 } = req.query;
     
@@ -146,6 +185,9 @@ router.get('/forecast', async (req, res) => {
       updateTime: response.data.updateTime
     };
     
+    // 设置缓存头
+    res.setHeader('Cache-Control', 's-maxage=7200, stale-while-revalidate');
+    
     // 存入缓存
     cache.set(cacheKey, forecastData, 7200); // 缓存2小时
     
@@ -157,13 +199,12 @@ router.get('/forecast', async (req, res) => {
       message: '获取天气预报失败'
     });
   }
-});
+}
 
 /**
  * 获取逐小时预报
- * GET /api/weather/hourly?city=cityname
  */
-router.get('/hourly', async (req, res) => {
+async function handleHourly(req, res) {
   try {
     const { city } = req.query;
     
@@ -208,6 +249,9 @@ router.get('/hourly', async (req, res) => {
       updateTime: response.data.updateTime
     };
     
+    // 设置缓存头
+    res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate');
+    
     // 存入缓存
     cache.set(cacheKey, hourlyData, 3600); // 缓存1小时
     
@@ -219,7 +263,7 @@ router.get('/hourly', async (req, res) => {
       message: '获取小时预报失败'
     });
   }
-});
+}
 
 /**
  * 获取城市ID工具函数
@@ -247,59 +291,4 @@ async function getCityId(cityName) {
     console.error('获取城市ID失败:', error);
     return null;
   }
-}
-
-// Vercel Serverless Function 处理
-if (process.env.VERCEL) {
-  module.exports = async (req, res) => {
-    // 设置CORS头
-    res.setHeader('Access-Control-Allow-Credentials', true);
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
-    res.setHeader(
-      'Access-Control-Allow-Headers',
-      'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
-    );
-
-    if (req.method === 'OPTIONS') {
-      return res.status(200).end();
-    }
-
-    // 打印请求信息以便调试
-    console.log(`处理请求: ${req.url}`);
-    console.log(`查询参数:`, req.query);
-
-    // 解析endpoint和其他参数
-    const endpoint = req.query.endpoint || 'current';
-    const city = req.query.city;
-    const days = req.query.days || 3;
-
-    // 根据endpoint调用对应的路由处理函数
-    try {
-      if (endpoint === 'current') {
-        if (!router["GET_/current"]) {
-          return res.status(404).json({ error: 'API路由不存在' });
-        }
-        return router["GET_/current"](req, res);
-      } else if (endpoint === 'forecast') {
-        if (!router["GET_/forecast"]) {
-          return res.status(404).json({ error: 'API路由不存在' });
-        }
-        return router["GET_/forecast"](req, res);
-      } else if (endpoint === 'hourly') {
-        if (!router["GET_/hourly"]) {
-          return res.status(404).json({ error: 'API路由不存在' });
-        }
-        return router["GET_/hourly"](req, res);
-      } else {
-        return res.status(400).json({ error: '不支持的天气接口' });
-      }
-    } catch (error) {
-      console.error('API处理错误:', error);
-      return res.status(500).json({ error: '处理请求时发生错误' });
-    }
-  };
-} else {
-  // Express环境导出路由
-  module.exports = router;
 } 
